@@ -3,18 +3,24 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { formatDate } from './helpers';
 import { RecordsResponse } from './types';
+import Pagination from './Pagination';
 
 import './styles.css';
 
 const Records = () => {
 
     const [recordsResponse, setRecordsResponse] = useState<RecordsResponse>();
+    const [activePage, setActivePage] = useState(0);
+
 
     useEffect(() => {
-        api.get('/records?linesPerPage=12')
+        api.get(`/records?linesPerPage=12&page=${activePage}`)
             .then(res => setRecordsResponse(res.data));
-    }, [])
+    }, [activePage])
 
+    const handlePageChange = (index: number) => {
+        setActivePage(index);
+    }
 
     return (
         <div className="page-container">
@@ -42,6 +48,11 @@ const Records = () => {
                     ))}
                 </tbody>
             </table>
+            <Pagination
+                totalPages={recordsResponse?.totalPages}
+                goToPage={handlePageChange}
+                activePage={activePage}
+            />
         </div>
     )
 }
