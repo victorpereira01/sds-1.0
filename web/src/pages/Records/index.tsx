@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { formatDate } from './helpers';
 import { RecordsResponse } from './types';
 import Pagination from './Pagination';
+import Filters from '../../components/Filters';
 
 import './styles.css';
 
@@ -11,7 +12,6 @@ const Records = () => {
 
     const [recordsResponse, setRecordsResponse] = useState<RecordsResponse>();
     const [activePage, setActivePage] = useState(0);
-
 
     useEffect(() => {
         api.get(`/records?linesPerPage=12&page=${activePage}`)
@@ -24,6 +24,7 @@ const Records = () => {
 
     return (
         <div className="page-container">
+            <Filters link="/charts" linkText="VER GRÁFICO" />
             <table className="records-table" cellPadding="0" cellSpacing="0">
                 <thead>
                     <tr>
