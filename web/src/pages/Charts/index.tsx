@@ -2,7 +2,7 @@ import React from 'react';
 import Filters from '../../components/Filters';
 import Chart from 'react-apexcharts';
 
-import { barOptions } from './chart-options';
+import { barOptions, pieOptions } from './chart-options';
 
 import './styles.css';
 
@@ -23,7 +23,7 @@ const chartData = [
         x: 'Victor',
         y: 10
     },
-    
+
 ]
 
 const Charts = () => {
@@ -40,6 +40,26 @@ const Charts = () => {
                             width="900"
                             height="150"
                             series={[{ data: chartData }]}
+                        />
+                    </div>
+                </div>
+                <div className="charts">
+                    <div className="platform-chart">
+                        <h2 className="chart-title">PLATAFORMAS</h2>
+                        <Chart
+                            options={{ ...pieOptions, labels: ['Victor', 'Pereira'] }}
+                            type="donut"
+                            series={[30, 70]}
+                            width="350"
+                        />
+                    </div>
+                    <div className="platform-chart">
+                        <h2 className="chart-title">GÊNEROS</h2>
+                        <Chart
+                            options={{ ...pieOptions, labels: ['Victor', 'Pereira'] }}
+                            type="donut"
+                            series={[30, 70]}
+                            width="350"
                         />
                     </div>
                 </div>
