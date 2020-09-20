@@ -6,21 +6,45 @@ import { FontAwesome5 as Icon } from '@expo/vector-icons';
 
 import Header from '../../components/Header';
 import PlatformCard from './PlatformCard';
-import { GamePlatform } from './types';
+import { GamePlatform, Game } from './types';
+
+import api from '../../services/api';
 
 const placeholder = {
     label: 'Selecione o Game',
     value: null
 }
 
+const mapSelectValue = (games: Game[]) => {
+    return games.map(game => ({
+        ...game,
+        label: game.title,
+        value: game.id
+    }))
+}
+
 const CreateRecord = () => {
 
     const [platform, setPlatform] = useState<GamePlatform>();
     const [selectedGame, setSelectedGame] = useState('');
+    const [allGames, setAllGames] = useState<Game[]>([]);
+    const [filteredGames, setFilteredGames] = useState<Game[]>([]);
 
     const handleChangePlatform = (selectedPlatform: GamePlatform) => {
         setPlatform(selectedPlatform);
+        const gamesByPlatform = allGames.filter(
+            game => game.platform === selectedPlatform
+        )
+        setFilteredGames(gamesByPlatform);
     }
+
+    useEffect(() => {
+        api.get('/games')
+            .then(res => {
+                const selectValues = mapSelectValue(res.data);
+                setAllGames(selectValues);
+            });
+    })
 
     return (
         <>
@@ -66,12 +90,10 @@ const CreateRecord = () => {
                     onValueChange={value => {
                         setSelectedGame(value);
                     }}
-                    items={[
-                        { label: 'Football', value: 'football' },
-                        { label: 'Baseball', value: 'baseball' },
-                    ]}
+                    value={selectedGame}
+                    items={filteredGames}
                     Icon={() => {
-                        return <Icon name="chevron-down" color="#9e9e9e" size={25}/>
+                        return <Icon name="chevron-down" color="#9e9e9e" size={25} />
                     }}
                 />
             </View>
