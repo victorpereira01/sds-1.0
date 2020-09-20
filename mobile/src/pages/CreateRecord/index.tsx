@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import { Text, StyleSheet, View, Alert } from 'react-native';
+import { RectButton, TextInput } from 'react-native-gesture-handler';
 import RNPickerSelect from 'react-native-picker-select';
 import { FontAwesome5 as Icon } from '@expo/vector-icons';
 
@@ -25,10 +25,23 @@ const mapSelectValue = (games: Game[]) => {
 
 const CreateRecord = () => {
 
+    const [name, setName] = useState('');
+    const [age, setAge] = useState('');
     const [platform, setPlatform] = useState<GamePlatform>();
     const [selectedGame, setSelectedGame] = useState('');
     const [allGames, setAllGames] = useState<Game[]>([]);
     const [filteredGames, setFilteredGames] = useState<Game[]>([]);
+
+    useEffect(() => {
+        api.get('/games')
+            .then(res => {
+                const selectValues = mapSelectValue(res.data);
+                setAllGames(selectValues);
+            })
+            .catch(() => {
+                Alert.alert('Erro ao listar os jogos!')
+            })
+    })
 
     const handleChangePlatform = (selectedPlatform: GamePlatform) => {
         setPlatform(selectedPlatform);
@@ -38,13 +51,25 @@ const CreateRecord = () => {
         setFilteredGames(gamesByPlatform);
     }
 
-    useEffect(() => {
-        api.get('/games')
+    const handleSubmit = () => {
+        const payload = {
+            name,
+            age,
+            gameId: selectedGame
+        };
+
+        api.post('/records/', payload)
             .then(res => {
-                const selectValues = mapSelectValue(res.data);
-                setAllGames(selectValues);
-            });
-    })
+                Alert.alert("FOI");
+                setName('');
+                setAge('');
+                setSelectedGame('');
+                setPlatform(undefined);
+            })
+            .catch(() => {
+                Alert.alert('Erro ao salvar informações!')
+            })
+    }
 
     return (
         <>
@@ -54,6 +79,8 @@ const CreateRecord = () => {
                     style={styles.inputText}
                     placeholder="Nome"
                     placeholderTextColor="#9e9e9e"
+                    onChangeText={text => setName(text)}
+                    value={name}
                 />
                 <TextInput
                     style={styles.inputText}
@@ -61,6 +88,8 @@ const CreateRecord = () => {
                     placeholderTextColor="#9e9e9e"
                     keyboardType="numeric"
                     maxLength={3}
+                    onChangeText={text => setAge(text)}
+                    value={age}
                 />
 
                 <View style={styles.platformContainer}>
@@ -96,6 +125,11 @@ const CreateRecord = () => {
                         return <Icon name="chevron-down" color="#9e9e9e" size={25} />
                     }}
                 />
+                <View style={styles.footer}>
+                    <RectButton style={styles.button} onPress={handleSubmit}>
+                        <Text style={styles.buttonText}>SALVAR</Text>
+                    </RectButton>
+                </View>
             </View>
         </>
     )
